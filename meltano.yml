@@ -13,13 +13,21 @@ plugins:
     pip_url: git+https://github.com/MeltanoLabs/tap-beautifulsoup.git@v0.1.0
     config:
       source_name: sdk-docs
-      site_url: https://sdk.meltano.com/en/latest/
+      site_url: https://datacisions.com #OLD VALUE: https://sdk.meltano.com/en/latest/
       output_folder: output
       parser: html.parser
       download_recursively: true
       find_all_kwargs:
         attrs:
           role: main
+  - name: tap-csv
+    config:
+      files:
+        - entity: "doc"
+          path: "./data/mental_models.csv"
+          keys: ["id"]
+          delimiter: ";"
+
   loaders:
   - name: target-pinecone
     variant: meltanolabs
