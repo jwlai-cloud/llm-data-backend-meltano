@@ -35,7 +35,7 @@ plugins:
     config:
       document_text_property: page_content
       embeddings_property: embeddings
-      metadata_property: metadata
+    #  metadata_property: metadata
       pinecone_metadata_text_key: text
       load_method: overwrite
   mappers:
@@ -46,7 +46,7 @@ plugins:
     - name: add-embeddings
       config:
         document_text_property: page_content
-        document_metadata_property: metadata
+   #     document_metadata_property: metadata
   - name: mapper-generic
     namespace: mapper_generic
     pip_url: git+https://github.com/pnadolny13/mapper-generic.git@cdb09aec80d9c139784190959c0a9a801cdaf269
@@ -55,6 +55,14 @@ plugins:
     - name: clean-text
       config:
         code_path: mappers/clean_text.py
+    - name: add-meta
+      config:
+        stream_maps:
+        doc:
+          metadata:
+            source: "data/mental_models.csv" 
+            time_extracted: "2023-08-23T13:16:34.631170+00:00"
+  
   utilities:
   - name: streamlit_app
     namespace: streamlit_app
