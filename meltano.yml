@@ -21,12 +21,14 @@ plugins:
         attrs:
           role: main
   - name: tap-csv
+    pip_url: git+https://github.com/sbalnojan/tap-csv.git
     config:
       files:
-        - entity: "doc"
-          path: "./data/mental_models.csv"
-          keys: ["id"]
-          delimiter: ";"
+      - entity: doc
+        path: ./data/mental_models.csv
+        keys: [id]
+        delimiter: ;
+      add_metadata_dict: True
 
   loaders:
   - name: target-pinecone
@@ -38,7 +40,32 @@ plugins:
     #  metadata_property: metadata
       pinecone_metadata_text_key: text
       load_method: overwrite
+  - name: target-jsonl
+    variant: andyh1203
+    pip_url: target-jsonl
+  utilities:
+  - name: streamlit_app
+    namespace: streamlit_app
+    pip_url: langchain streamlit openai pinecone-client tiktoken
+    commands:
+      demo_ui:
+        args: run demo_ui/llm_app_ui.py
+        executable: streamlit
   mappers:
+  - name: meltano-map-transformer
+    pip_url: git+https://github.com/MeltanoLabs/meltano-map-transform.git
+    executable: meltano-map-transform
+    mappings:
+    - name: add-meta
+      config:
+        stream_maps:
+          doc:
+            id: id 
+            page_content: page_content 
+            metadata: #dict({1:"2"})
+              source: '\"client-123\"' #data/mental_models.csv #str("data/mental_models.csv")
+              time_extracted: '\"client-123\"' #"2023-08-23T13:16:34.631170+00:00"
+
   - name: map-gpt-embeddings
     variant: meltanolabs
     pip_url: git+https://github.com/meltanolabs/map-gpt-embeddings.git@50e35fa3912a88a47d0971870176f604c68fd73e
@@ -55,26 +82,16 @@ plugins:
     - name: clean-text
       config:
         code_path: mappers/clean_text.py
-    - name: add-meta
-      config:
-        stream_maps:
-        doc:
-          metadata:
-            source: "data/mental_models.csv" 
-            time_extracted: "2023-08-23T13:16:34.631170+00:00"
-  
-  utilities:
-  - name: streamlit_app
-    namespace: streamlit_app
-    pip_url: langchain streamlit openai pinecone-client tiktoken
-    commands:
-      demo_ui:
-        executable: streamlit
-        args: run demo_ui/llm_app_ui.py
 jobs:
 - name: reload_pinecone
   tasks:
   - tap-beautifulsoup clean-text add-embeddings target-pinecone
+- name: test_csv
+  tasks:
+  - tap-csv clean-text target-jsonl #add-meta target-jsonl
+- name: test_csv_2
+  tasks:
+  - tap-csv clean-text add-meta add-embeddings target-jsonl
 schedules:
 - name: reload_pinecone
   interval: 0 0 * * 0
