@@ -52,20 +52,6 @@ plugins:
         args: run demo_ui/llm_app_ui.py
         executable: streamlit
   mappers:
-  - name: meltano-map-transformer
-    pip_url: git+https://github.com/MeltanoLabs/meltano-map-transform.git
-    executable: meltano-map-transform
-    mappings:
-    - name: add-meta
-      config:
-        stream_maps:
-          doc:
-            id: id 
-            page_content: page_content 
-            metadata: #dict({1:"2"})
-              source: '\"client-123\"' #data/mental_models.csv #str("data/mental_models.csv")
-              time_extracted: '\"client-123\"' #"2023-08-23T13:16:34.631170+00:00"
-
   - name: map-gpt-embeddings
     variant: meltanolabs
     pip_url: git+https://github.com/meltanolabs/map-gpt-embeddings.git@50e35fa3912a88a47d0971870176f604c68fd73e
@@ -73,7 +59,10 @@ plugins:
     - name: add-embeddings
       config:
         document_text_property: page_content
-   #     document_metadata_property: metadata
+        document_metadata_property: metadata
+        splitter_config:
+          chunk_size: 500
+          chunk_overlap: 200
   - name: mapper-generic
     namespace: mapper_generic
     pip_url: git+https://github.com/pnadolny13/mapper-generic.git@cdb09aec80d9c139784190959c0a9a801cdaf269
@@ -88,10 +77,13 @@ jobs:
   - tap-beautifulsoup clean-text add-embeddings target-pinecone
 - name: test_csv
   tasks:
-  - tap-csv clean-text target-jsonl #add-meta target-jsonl
+  - tap-csv clean-text target-jsonl
 - name: test_csv_2
   tasks:
-  - tap-csv clean-text add-meta add-embeddings target-jsonl
+  - tap-csv clean-text add-embeddings target-jsonl
+- name: test_csv_3
+  tasks:
+  - tap-csv clean-text add-embeddings target-pinecone
 schedules:
 - name: reload_pinecone
   interval: 0 0 * * 0
