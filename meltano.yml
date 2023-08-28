@@ -78,10 +78,10 @@ jobs:
 - name: test_csv
   tasks:
   - tap-csv clean-text target-jsonl
-- name: test_csv_2
+- name: test_embeddings
   tasks:
   - tap-csv clean-text add-embeddings target-jsonl
-- name: test_csv_3
+- name: reload_pinecone_csv
   tasks:
   - tap-csv clean-text add-embeddings target-pinecone
 schedules:
