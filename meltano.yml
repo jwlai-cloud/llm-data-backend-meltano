@@ -37,7 +37,6 @@ plugins:
     config:
       document_text_property: page_content
       embeddings_property: embeddings
-    #  metadata_property: metadata
       pinecone_metadata_text_key: text
       load_method: overwrite
   - name: target-jsonl
