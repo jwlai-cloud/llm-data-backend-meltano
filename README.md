@@ -47,7 +47,7 @@ plugins:
           role: main
 ```
 
-Note: For details on the configuration, head over to [tap-beautifulsoup on the Hub](https://hub.meltano.com/extractors/tap-beautifulsoup).
+*Note: For details on the configuration, head over to [tap-beautifulsoup on the Hub](https://hub.meltano.com/extractors/tap-beautifulsoup).*
 
 To test this modification out, just run `meltano invoke tap-beautifulsoup` and your new website should 
 get downloaded into the `output` folder.
