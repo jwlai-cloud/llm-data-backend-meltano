@@ -1,17 +1,25 @@
-# Build your own LLM-based application
+# Build your own LLM-based application in 30 mins
 
-This Meltano project helps you to customize [the LLM example repository](https://github.com/meltano/llm-data-backend-meltano)
-to fit your own application. It quickly shows how to ...
+This Meltano project helps you to build an LLM-based application fast by using a template repository that is easy to configure.
 
-- scrape a different website for context
-- use non-web resources as context (we're using a CSV with a text document within here)
+We're going to configure [LLM example repository from Meltano](https://github.com/meltano/llm-data-backend-meltano) to fit my own application.
+
+I'll show you how to ...
+
+- scrape a different website for context (my blog)
+- use non-web resources as context (I'm using a CSV with a text document inside)
 - adapt the cleaning mechanism (removing unicode characters)
 - test the process
 
 ## Prereqs
+Either be lazy and fork this repository, or fork the [the LLM example repository](https://github.com/meltano/llm-data-backend-meltano) repository 
+and go step-by-step to really learn something!
+
+You'll need:
 - An OpenAI account and API key (for a paid account - even if it's just $5! Otherwise the API rate limit will be a problem)
 - A Pinecone account and API key
 
+Then:
 1. Copy the `.env_template` file to `.env` and replace the sample values with your OpenAI and Pinecone values
 2. Run `meltano install`
 
@@ -20,8 +28,10 @@ Try out the original project first by...
 3. Running `meltano run reload_pinecone`
 4. Running the demo app `meltano invoke streamlit_app:demo_ui`
 
-## Step 0
-First, fork the [the LLM example repository](https://github.com/meltano/llm-data-backend-meltano) repository.
+This will scrape the "Meltano SDK" docs, chunk it into little pieces feed it into the OpenAI embeddings API, and store the resulting embedding inside pinecone.
+Then it will open up a demo application you can use to ask questions and get answers based on this new embedding!
+
+Once you're done playing around, you can follow along with my new application.
 
 # Scraping a new website for context
 If you want to still supply web-based context, then you need to configure the so-called "tap", that retrieves the
@@ -62,14 +72,14 @@ Finally, you can run `meltano invoke streamlit_app:demo_ui` to play around with 
 ## Using non-web based context
 I added another file with one of my articles as text, inside a CSV. It's inside [data/mental_models.csv](data/mental_models.csv). 
 
-Now we're going to create an embedding based on just this one article to "have a chat with this one document".
+Now we're going to create an embedding based on just this one article to have a chat with this one document.
 
 To do so, we need 
 - a different kind of data source, 
 - and adapt our cleaning mechanism a bit.
 
 ## Step 1 adding a new data source
-On [https://hub.meltano.com/](https://hub.meltano.com/) we find over 600 data sources, including the right tap, called "tap-csv". We can install it by adding the following segment to the `meltano.yml` file and then running the `meltano install` command: 
+On [https://hub.meltano.com/](https://hub.meltano.com/) we find over 600 data sources, including the right connector, called "tap-csv". We can install it by adding the following segment to the `meltano.yml` file and then running the `meltano install` command: 
 ```yaml
  - name: tap-csv
     pip_url: git+https://github.com/sbalnojan/tap-csv.git
@@ -118,4 +128,10 @@ To finally reload our embeddings inside pinecone and thus our application from t
 simply run 
 
 `meltano run tap-csv clean-text add-embeddings target-pinecone`
+
+Again, run
+
+`meltano invoke streamlit_app:demo_ui`
+
+to open up the chat dialog, and enjoy!
 
